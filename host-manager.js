@@ -14,7 +14,7 @@ let reservedMoneyAmount = 0; //250000000; // Enable if needed (Can also use rese
 let reservedMoneyPercent = 0.99; // Don't spend more than 1% of our money on temporary RAM
 let minRamExponent = 10;
 // The name to give all purchased servers. Also used to determine which servers were purchased
-const purchasedServerName = "daemon";
+const purchasedServerName = "pserv";
 // Frequency of update
 const interval = 10000;
 

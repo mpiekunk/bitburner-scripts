@@ -1,5 +1,5 @@
 import { getFilePath, getNsDataThroughFile, disableLogs, scanAllServers } from './helpers.js'
-const scriptSolver = getFilePath("/Tasks/contractor.js.solver.js");
+const scriptSolver = getFilePath("/Tasks/contract-solver.js");
 
 /** @param {NS} ns **/
 export async function main(ns) {

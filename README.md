@@ -1,6 +1,6 @@
 # Downloading the whole repository
 
-If you manually `nano git-pull.js` from the terminal and copy the [contents of that script](https://raw.githubusercontent.com/alainbryden/bitburner-scripts/main/git-pull.js), you should be able to run it once and download the rest of the files I use. Early-game, many will be useless because they are only enabled by late-game features, but they shouldn't give you too many problems just being there.
+If you manually `nano git-pull.js` from the terminal and copy the [contents of that script](https://raw.githubusercontent.com/mpiekunk/bitburner-scripts/main/git-pull.js), you should be able to run it once and download the rest of the files I use. Early-game, many will be useless because they are only enabled by late-game features, but they shouldn't give you too many problems just being there.
 
 ## Customizations
 
@@ -33,6 +33,3 @@ It's meant as an easy way for me to share code with friends, and track changes a
 - Please don't be insulted if you make a feature request, bug report, or pull request that I decline to act on.
 While I do like my work to be helpful to others and re-used, I am only willing to put so much effort into customizing it to others' specific needs or whims.
 You should fork the code, and start tweaking it the way you want it to behave. That's more in the spirit of the game!
-
-Hit up the Bitburner Discord with any questions: https://discord.gg/Wjrs92b3
-Many helpful folks in there are familiar with my scripts or ones similar to them and can address your questions and concerns far quicker than I can.

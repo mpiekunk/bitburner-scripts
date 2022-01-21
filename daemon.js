@@ -27,7 +27,7 @@ const maxGrowthRate = 1.0035;
 // Pad weaken thread counts to account for undershooting. (Shouldn't happen. And if this is a timing issue, padding won't help)
 const weakenThreadPadding = 0; //0.01;
 // The name given to purchased servers (should match what's in host-manager.js)
-const purchasedServersName = "daemon";
+const purchasedServersName = "pserv";
 
 // The maximum current total RAM utilization before we stop attempting to schedule work for the next less profitable server. Can be used to reserve capacity.
 const maxUtilization = 0.95;
@@ -216,6 +216,7 @@ export async function main(ns) {
     asynchronousHelpers = [
         { name: "stats.js", shouldRun: () => ns.getServerMaxRam("home") >= 64 /* Don't waste precious RAM */ }, // Adds stats not usually in the HUD
         { name: "hacknet-upgrade-manager.js", args: ["-c", "--max-payoff-time", "1h"] }, // Kickstart hash income by buying everything with up to 1h payoff time immediately
+/** 
         { name: "stockmaster.js", args: ["--show-market-summary"], tail: true, shouldRun: () => playerStats.hasTixApiAccess }, // Start our stockmaster if we have the required stockmarket access
         { name: "gangs.js", tail: true, shouldRun: () => 2 in dictSourceFiles }, // Script to create manage our gang for us
         { name: "spend-hacknet-hashes.js", args: ["-v"], shouldRun: () => 9 in dictSourceFiles }, // Always have this running to make sure hashes aren't wasted
@@ -224,6 +225,7 @@ export async function main(ns) {
             name: "work-for-factions.js", args: ['--fast-crimes-only', '--no-coding-contracts'],  // Singularity script to manage how we use our "focus" work.
             shouldRun: () => 4 in dictSourceFiles && (ns.getServerMaxRam("home") >= 128 / (2 ** dictSourceFiles[4])) // Higher SF4 levels result in lower RAM requirements
         },
+*/
     ];
     asynchronousHelpers.forEach(helper => helper.name = getFilePath(helper.name));
     asynchronousHelpers.forEach(helper => helper.isLaunched = false);
@@ -238,14 +240,18 @@ export async function main(ns) {
         // Buy every hacknet upgrade with up to 4h payoff if it is less than 10% of our current money or 8h if it is less than 1% of our current money
         { interval: 32000, name: "hacknet-upgrade-manager.js", shouldRun: shouldUpgradeHacknet, args: () => ["-c", "--max-payoff-time", "4h", "--max-spend", ns.getServerMoneyAvailable("home") * 0.1] },
         { interval: 33000, name: "hacknet-upgrade-manager.js", shouldRun: shouldUpgradeHacknet, args: () => ["-c", "--max-payoff-time", "8h", "--max-spend", ns.getServerMoneyAvailable("home") * 0.01] },
+/**        
         // Don't start auto-joining factions until we're holding 1 billion (so coding contracts returning money is probably less critical) or we've joined one already
         {
             interval: 34000, name: "faction-manager.js", requiredServer: "home", args: ['--join-only'],
             shouldRun: () => 4 in dictSourceFiles && (playerStats.factions.length > 0 || ns.getServerMoneyAvailable("home") > 1e9) &&
                 (ns.getServerMaxRam("home") >= 128 / (2 ** dictSourceFiles[4])) // Uses singularity functions, and higher SF4 levels result in lower RAM requirements
         },
+*/
         { interval: 51000, name: "/Tasks/contractor.js", requiredServer: "home" },
+/**
         { interval: 110000, name: "/Tasks/backdoor-all-servers.js", requiredServer: "home", shouldRun: () => 4 in dictSourceFiles },
+*/
         { interval: 111000, name: "host-manager.js", requiredServer: "home", shouldRun: () => !shouldReserveMoney() },
     ];
     periodicScripts.forEach(tool => tool.name = getFilePath(tool.name));
@@ -366,13 +372,13 @@ async function doTargetingLoop(ns) {
                 await refreshDynamicServerData(ns, addedServerNames);
                 // Occassionally print our current targetting order (todo, make this controllable with a flag or custom UI?)
                 if (verbose && loops % 600 == 0)
-                    log('Targetting Order:\n  ' + serverListByTargetOrder.filter(s => s.shouldHack()).map(s =>
-                        `${s.isPrepped() ? '*' : ' '} ${s.canHack() ? '✓' : 'X'} Money: ${formatMoney(s.getMoney(), 4)} of ${formatMoney(s.getMaxMoney(), 4)} ` +
-                        `(${formatMoney(s.getMoneyPerRamSecond(), 4)}/ram.sec), Sec: ${formatNumber(s.getSecurity(), 3)} of ${formatNumber(s.getMinSecurity(), 3)}, ` +
-                        `TTW: ${formatDuration(s.timeToWeaken())}, Hack: ${s.requiredHackLevel} - ${s.name}` +
+                    log('Targetting Order:\n  ' + serverListByTargetOrder.filter(s => s.shouldHack()).map(s =>
+                        `${s.isPrepped() ? '*' : ' '} ${s.canHack() ? '✓' : 'X'} Money: ${formatMoney(s.getMoney(), 4)} of ${formatMoney(s.getMaxMoney(), 4)} ` +
+                        `(${formatMoney(s.getMoneyPerRamSecond(), 4)}/ram.sec), Sec: ${formatNumber(s.getSecurity(), 3)} of ${formatNumber(s.getMinSecurity(), 3)}, ` +
+                        `TTW: ${formatDuration(s.timeToWeaken())}, Hack: ${s.requiredHackLevel} - ${s.name}` +
                         (!stockMode || !serverStockSymbols[s.name] ? '' : ` Sym: ${serverStockSymbols[s.name]} Owned: ${serversWithOwnedStock.includes(s.name)} ` +
                             `Manip: ${shouldManipulateGrow[s.name] ? "grow" : shouldManipulateHack[s.name] ? "hack" : '(disabled)'}`))
-                        .join('\n  '));
+                        .join('\n  '));
             }
             var prepping = [];
             var preppedButNotTargeting = [];
@@ -963,10 +969,10 @@ function getScheduleTiming(fromDate, currentTarget) {
     };
     if (verbose && runOnce) {
         log(`Current Time: ${formatDateTime(new Date())} Established a schedule for ${getTargetSummary(currentTarget)} from requested startTime ${formatDateTime(fromDate)}:` +
-            `\n  Hack - End: ${formatDateTime(schedule.hackEnd)}  Start: ${formatDateTime(schedule.hackStart)}  Time: ${formatDuration(hackTime)}` +
-            `\n  Weak1- End: ${formatDateTime(schedule.firstWeakenEnd)}  Start: ${formatDateTime(schedule.firstWeakenStart)}  Time: ${formatDuration(weakenTime)}` +
-            `\n  Grow - End: ${formatDateTime(schedule.growEnd)}  Start: ${formatDateTime(schedule.growStart)}  Time: ${formatDuration(growTime)}` +
-            `\n  Weak2- End: ${formatDateTime(schedule.secondWeakenEnd)}  Start: ${formatDateTime(schedule.secondWeakenStart)}  Time: ${formatDuration(weakenTime)}`);
+            `\n  Hack - End: ${formatDateTime(schedule.hackEnd)}  Start: ${formatDateTime(schedule.hackStart)}  Time: ${formatDuration(hackTime)}` +
+            `\n  Weak1- End: ${formatDateTime(schedule.firstWeakenEnd)}  Start: ${formatDateTime(schedule.firstWeakenStart)}  Time: ${formatDuration(weakenTime)}` +
+            `\n  Grow - End: ${formatDateTime(schedule.growEnd)}  Start: ${formatDateTime(schedule.growStart)}  Time: ${formatDuration(growTime)}` +
+            `\n  Weak2- End: ${formatDateTime(schedule.secondWeakenEnd)}  Start: ${formatDateTime(schedule.secondWeakenStart)}  Time: ${formatDuration(weakenTime)}`);
     }
     return schedule;
 }
@@ -1505,7 +1511,7 @@ async function establishMultipliers(ns) {
         ScriptHackMoneyGain: 1
     };
     if (verbose)
-        log(`Bitnode mults:\n  ${Object.keys(bitnodeMults).filter(k => bitnodeMults[k] != 1.0).map(k => `${k}: ${bitnodeMults[k]}`).join('\n  ')}`);
+        log(`Bitnode mults:\n  ${Object.keys(bitnodeMults).filter(k => bitnodeMults[k] != 1.0).map(k => `${k}: ${bitnodeMults[k]}`).join('\n  ')}`);
 }
 
 /** @param {NS} ns **/
