@@ -1,0 +1,7 @@
+unalias find;
+unalias cleanup;
+unalias start;
+
+alias find="run find-server.js -c";
+alias cleanup="run cleanup.js -a";
+alias start="run daemon.js -v --tail";
