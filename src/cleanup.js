@@ -38,5 +38,5 @@ export async function main(ns) {
       if (!dryrun) ns.rm(file, server);
     }
   }
-  if (!silent) ns.tprint(`Removed (${fileCount}) files on (${serverCount})`);
+  if (!silent) ns.tprint(`Removed (${fileCount}) files on (${serverCount}) servers`);
 }
