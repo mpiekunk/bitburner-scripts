@@ -270,17 +270,11 @@ export function log(ns, message = "", alsoPrintToTerminal = false, toastStyle = 
  * @param {NS} ns - The nestcript instance passed to your script's main entry point */
 export function scanAllServers(ns) {
     checkNsInstance(ns, '"scanAllServers"');
-    let discoveredHosts = []; // Hosts (a.k.a. servers) we have scanned
-    let hostsToScan = ["home"]; // Hosts we know about, but have no yet scanned
-    let infiniteLoopProtection = 9999; // In case you mess with this code, this should save you from getting stuck
-    while (hostsToScan.length > 0 && infiniteLoopProtection-- > 0) { // Loop until the list of hosts to scan is empty
-        let hostName = hostsToScan.pop(); // Get the next host to be scanned
-        for (const connectedHost of ns.scan(hostName)) // "scan" (list all hosts connected to this one)
-            if (!discoveredHosts.includes(connectedHost)) // If we haven't already scanned this host
-                hostsToScan.push(connectedHost); // Add it to the queue of hosts to be scanned
-        discoveredHosts.push(hostName); // Mark this host as "scanned"
+    let hostnames = ['home']; // Hosts we know about, but have no yet scanned
+    for (let hostname of hostnames) {
+      hostnames.push(...ns.scan(hostname).filter((host) => !hostnames.includes(host)));
     }
-    return discoveredHosts; // The list of scanned hosts should now be the set of all hosts in the game!
+    return hostnames; // The list of scanned hosts should now be the set of all hosts in the game!
 }
 
 /** @param {NS} ns 
