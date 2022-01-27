@@ -299,7 +299,6 @@ const codingContractTypesMetadata = [
   },
   {
     name: 'Unique Paths in a Grid I',
-    /**
     solver: function (data) {
         var n = data[0] // Number of rows
         var m = data[1] // Number of columns
@@ -315,11 +314,9 @@ const codingContractTypesMetadata = [
         }
         return currentRow[n - 1]
     }
-*/
   },
   {
     name: 'Unique Paths in a Grid II',
-    /**
     solver: function (data) {
         var obstacleGrid = []
         obstacleGrid.length = data.length
@@ -339,7 +336,6 @@ const codingContractTypesMetadata = [
         }
         return obstacleGrid[obstacleGrid.length - 1][obstacleGrid[0].length - 1]
     }
-*/
   },
 
   {
