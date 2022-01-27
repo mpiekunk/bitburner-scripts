@@ -2,40 +2,25 @@
 // It does this by requiring all contract information being gathered in advance and passed in as a JSON blob argument.
 /** @param {NS} ns **/
 export async function main(ns) {
-    if (ns.args.length < 1)
-        ns.tprint('Contractor solver was incorrectly invoked without arguments.');
-    var contractsDb = JSON.parse(ns.args[0]);
-    for (const contractInfo of contractsDb) {
-        const contractSolverExists = codingContractSolutionDefined(ns, contractInfo);
-
-        // Continue if contract solver doesn't exist yet
-        if (contractSolverExists == false) { continue; }
-
-        const answer = findAnswer(contractInfo);
-        if (answer != null) {
-            const solvingResult = ns.codingcontract.attempt(answer, contractInfo.contract, contractInfo.hostname, { returnReward: true });
-            if (solvingResult) {
-                ns.toast(`Solved ${contractInfo.contract} on ${contractInfo.hostname}`, 'success');
-                ns.tprint(`INFO: Solved ${contractInfo.contract} on ${contractInfo.hostname}. Reward: ${solvingResult}`);
-            } else {
-                ns.tprint(`ERROR: Wrong answer for ${contractInfo.contract} on ${contractInfo.hostname}: ${JSON.stringify(answer)}`);
-            }
-        }
-        await ns.sleep(10);
+  if (ns.args.length < 1) ns.tprint('Contractor solver was incorrectly invoked without arguments.');
+  var contractsDb = JSON.parse(ns.args[0]);
+  for (const contractInfo of contractsDb) {
+    const answer = findAnswer(contractInfo);
+    if (answer != null) {
+      const solvingResult = ns.codingcontract.attempt(answer, contractInfo.contract, contractInfo.hostname, {
+        returnReward: true,
+      });
+      if (solvingResult) {
+        ns.toast(`Solved ${contractInfo.contract} on ${contractInfo.hostname}`, 'success');
+        ns.tprint(`Solved ${contractInfo.contract} on ${contractInfo.hostname}. Reward: ${solvingResult}`);
+      } else {
+        ns.tprint(`Wrong answer for ${contractInfo.contract} on ${contractInfo.hostname}: ${JSON.stringify(answer)}`);
+      }
+    } else {
+      ns.tprint(`Unable to find the answer for: ${JSON.stringify(contractInfo)}`);
     }
-}
-
-function codingContractSolutionDefined(ns, contract) {
-    const codingContractSolution = codingContractTypesMetadata.find((codingContractTypeMetadata) => codingContractTypeMetadata.name === contract.type);
-    if (!codingContractSolution) {
-        ns.tprint(`ERROR: Unknown type of coding contract: '${contract.type}'`);
-        return false;
-    }
-    if (!codingContractSolution.hasOwnProperty('solver')) {
-        ns.print(`WARNING: Undefined solver for '${contract.type}' coding contracts`);
-        return false;
-    }
-    return true;
+    await ns.sleep(10);
+  }
 }
 
 function findAnswer(contract) {
@@ -230,7 +215,6 @@ const codingContractTypesMetadata = [
   },
   {
     name: 'Algorithmic Stock Trader III',
-    /**
     solver: function (data) {
         var hold1 = Number.MIN_SAFE_INTEGER
         var hold2 = Number.MIN_SAFE_INTEGER
@@ -245,11 +229,9 @@ const codingContractTypesMetadata = [
         }
         return release2.toString()
     }
-*/
   },
   {
     name: 'Algorithmic Stock Trader IV',
-    /**
     solver: function (data) {
         var k = data[0]
         var prices = data[1]
@@ -282,7 +264,6 @@ const codingContractTypesMetadata = [
         }
         return rele[k]
     }
-*/
   },
   {
     name: 'Minimum Path Sum in a Triangle',
@@ -383,7 +364,6 @@ const codingContractTypesMetadata = [
   },
   {
     name: 'Find All Valid Math Expressions',
-    /**
     solver: function (data) {
         var num = data[0]
         var target = data[1]
@@ -417,6 +397,5 @@ const codingContractTypesMetadata = [
         helper(result, '', num, target, 0, 0, 0)
         return result
     }
-*/
   },
 ];
