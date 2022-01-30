@@ -281,8 +281,9 @@ export async function main(ns) {
             shouldRun: () => 4 in dictSourceFiles && (playerStats.factions.length > 0 || ns.getServerMoneyAvailable("home") > 1e9) &&
                 (ns.getServerMaxRam("home") >= 128 / (2 ** dictSourceFiles[4])) // Uses singularity functions, and higher SF4 levels result in lower RAM requirements
         },
-        { interval: 51000, name: "/Tasks/contractor.js", requiredServer: "home" },
 */
+      { interval: 51000, name: '/Tasks/contractor.js', requiredServer: 'home' },
+
       {
         interval: 110000,
         name: '/Tasks/backdoor-all-servers.js',
