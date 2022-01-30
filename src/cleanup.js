@@ -20,23 +20,43 @@ export function autocomplete(data, _) {
 export async function main(ns) {
   const options = ns.flags(argsSchema);
   const all = options.a || options.all;
-  const dryrun = options.n || options.dryrun;
+  const dryRun = options.n || options.dryrun;
   const silent = options.s || options.silent;
   const verbose = options.v || options.verbose;
   const servers = all ? scanAllServers(ns) : ['home'];
+  const msgPrefix = dryRun ? 'Remove' : 'Removed';
+  
 
   let fileCount = 0;
   let serverCount = 0;
   for (let server of servers) {
-    let files = server === 'home' ? ns.ls('home', '/Temp/') : ns.ls(server, '.js');
+    // Set the list of grep statements for ls based on home server or remote server
+    let grepList = server === 'home' ? ['/Temp/'] : ['/Remote/', 'helpers.js'];
+    
+    let files = [];
+
+    // Get files on server for all grep statements
+    for (let grep of grepList) {
+      files.push(...(ns.ls(server, grep)));
+    }
+
+    // Increase server/file count if files found, otherwise skip to next server
     if (files.length > 0) {
-      fileCount++;
       serverCount++;
+      fileCount = fileCount + files.length;
     }
-    for (let file of files) {
-      if (dryrun || verbose) ns.tprint(`(${server}) rm ${file}`);
-      if (!dryrun) ns.rm(file, server);
+    else { continue; }
+
+    // Remove each file if not dry run
+    if (!dryRun) {
+      for (let file of files) ns.rm(file, server);
     }
+
+    // Print result if dry run or verbose
+    if (dryRun || verbose) ns.tprint(`${msgPrefix} (${files.length}) files on '${server}': [ ${files} ]`);
+
   }
-  if (!silent) ns.tprint(`Removed (${fileCount}) files on (${serverCount}) servers`);
+
+  // Print summary statement
+  if (!silent) ns.tprint(`${msgPrefix} (${fileCount}) files on (${serverCount}) servers`);
 }
