@@ -283,14 +283,12 @@ export async function main(ns) {
         },
 */
       { interval: 51000, name: '/Tasks/contractor.js', requiredServer: 'home' },
-      /** 
       {
         interval: 110000,
         name: '/Tasks/backdoor-all-servers.js',
         requiredServer: 'home',
         shouldRun: () => 4 in dictSourceFiles,
       },
-*/
       {
         interval: 111000,
         name: 'host-manager.js',
